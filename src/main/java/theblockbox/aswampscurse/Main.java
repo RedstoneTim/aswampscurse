@@ -1,84 +1,67 @@
 package theblockbox.aswampscurse;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntityType;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.SpawnEggItem;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import theblockbox.aswampscurse.entity.NecromanticWitchEntity;
+import theblockbox.aswampscurse.entity.NecromanticWitchRenderer;
+import theblockbox.aswampscurse.entity.NecroticGhoulEntity;
+import theblockbox.aswampscurse.entity.NecroticGhoulRenderer;
 
-import java.util.stream.Collectors;
-
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod("aswampscurse")
 public class Main {
-    // Directly reference a log4j logger.
+    public static final EntityType<NecromanticWitchEntity> NECROMANTIC_WITCH_TYPE = EntityType.Builder.create(NecromanticWitchEntity::new,
+            EntityClassification.MONSTER).size(0.6F, 1.95F).build("necromantic_witch");
+    public static final EntityType<NecroticGhoulEntity> NECROTIC_GHOUL_TYPE = EntityType.Builder.create(NecroticGhoulEntity::new,
+            EntityClassification.MONSTER).size(0.6F, 1.95F).build("necrotic_ghoul");
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public Main() {
-        // Register the setup method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        // Register the enqueueIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueueIMC);
-        // Register the processIMC method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::processIMC);
-        // Register the doClientStuff method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientStuff);
+    static {
+        Main.NECROMANTIC_WITCH_TYPE.setRegistryName("aswampscurse:necromantic_witch");
+        Main.NECROTIC_GHOUL_TYPE.setRegistryName("aswampscurse:necrotic_ghoul");
+    }
 
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
+    public Main() {
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
-        LOGGER.info("DIRT BLOCK >> {}", Blocks.DIRT.getRegistryName());
+        // pre init code
     }
 
-    private void doClientStuff(final FMLClientSetupEvent event) {
-        // do something that can only be done on the client
-        LOGGER.info("Got game settings {}", event.getMinecraftSupplier().get().gameSettings);
-    }
-
-    private void enqueueIMC(final InterModEnqueueEvent event) {
-        // some example code to dispatch IMC to another mod
-        InterModComms.sendTo("examplemod", "helloworld", () -> {
-            LOGGER.info("Hello world from the MDK");
-            return "Hello world";
-        });
-    }
-
-    private void processIMC(final InterModProcessEvent event) {
-        // some example code to receive and process InterModComms from other mods
-        LOGGER.info("Got IMC {}", event.getIMCStream().
-                map(m -> m.getMessageSupplier().get()).
-                collect(Collectors.toList()));
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
-        // do something when the server starts
-        LOGGER.info("HELLO from server starting");
-    }
-
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
-    // Event bus for receiving Registry Events)
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
         @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // register a new block here
-            LOGGER.info("HELLO from Register Block");
+        public static void onItemRegistry(final RegistryEvent.Register<Item> event) {
+            event.getRegistry().registerAll(new SpawnEggItem(Main.NECROMANTIC_WITCH_TYPE, 3407872, 9872190,
+                            new Item.Properties().group(ItemGroup.MISC)).setRegistryName("aswampscurse:necromantic_witch_spawn_egg"),
+                    new SpawnEggItem(Main.NECROTIC_GHOUL_TYPE, 3407872, 9872190,
+                            new Item.Properties().group(ItemGroup.MISC)).setRegistryName("aswampscurse:necrotic_ghoul_spawn_egg"),
+                    new Item(new Item.Properties().group(ItemGroup.MISC)).setRegistryName("aswampscurse:swamps_fetish"));
+        }
+
+        @SubscribeEvent
+        public static void onEntityRegistry(final RegistryEvent.Register<EntityType<?>> event) {
+            event.getRegistry().registerAll(Main.NECROMANTIC_WITCH_TYPE, Main.NECROTIC_GHOUL_TYPE);
+        }
+
+        @SubscribeEvent
+        public static void onModelRegister(ModelRegistryEvent event) {
+            EntityRendererManager manager = Minecraft.getInstance().getRenderManager();
+            manager.register(NecromanticWitchEntity.class, new NecromanticWitchRenderer(manager));
+            manager.register(NecroticGhoulEntity.class, new NecroticGhoulRenderer(manager));
         }
     }
 }

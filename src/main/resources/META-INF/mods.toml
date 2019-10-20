@@ -18,7 +18,7 @@ version="${file.jarVersion}" #mandatory
  # A display name for the mod
 displayName="A Swamp's Curse" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
-updateJSONURL="http://myurl.me/" #optional
+updateJSONURL="https://raw.githubusercontent.com/RedstoneTim/aswampscurse/master/updatechecker.json" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="https://minecraft.curseforge.com/projects/aswampscurse" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
