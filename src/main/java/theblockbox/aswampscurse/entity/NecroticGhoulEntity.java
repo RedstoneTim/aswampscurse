@@ -7,6 +7,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import theblockbox.aswampscurse.Main;
 
 public class NecroticGhoulEntity extends ZombieEntity {
     public NecroticGhoulEntity(EntityType<NecroticGhoulEntity> type, World world) {
@@ -23,8 +24,9 @@ public class NecroticGhoulEntity extends ZombieEntity {
     @Override
     public boolean attackEntityAsMob(Entity entity) {
         boolean toReturn = super.attackEntityAsMob(entity);
-        if (toReturn && (entity instanceof LivingEntity) && (this.rand.nextInt(4) > 0)) {
-            // TODO: apply virus here
+        if (toReturn && (entity instanceof LivingEntity) && (this.rand.nextInt(4) != 0)) {
+            // infect entity
+            entity.getCapability(Main.CAPABILITY_NECROTIC_VIRUS).ifPresent(necroticVirus -> necroticVirus.infectIfPossible(entity));
         }
         return toReturn;
     }

@@ -23,10 +23,17 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import theblockbox.aswampscurse.Main;
+
+import java.util.Random;
 
 public class NecromanticWitchEntity extends MonsterEntity implements IRangedAttackMob {
     public static final IDataSerializer<Long> LONG_SERIALIZER = new IDataSerializer<Long>() {
@@ -59,6 +66,11 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
                 }
             }
         };
+    }
+
+    public static boolean canSpawnHere(EntityType<? extends MonsterEntity> p_223325_0_, IWorld world, SpawnReason p_223325_2_, BlockPos pos, Random p_223325_4_) {
+        Biome biome = world.getBiome(pos);
+        return (biome == Biomes.SWAMP || biome == Biomes.SWAMP_HILLS) && MonsterEntity.func_223325_c(p_223325_0_,world,p_223325_2_,pos, p_223325_4_);
     }
 
     @Override
@@ -94,7 +106,7 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
             double angle = 0;
             double step = Math.PI / 2;
             for (int i = 0; i < 4; i++) {
-                NecroticGhoulEntity ghoulEntity = new NecroticGhoulEntity(Main.NECROTIC_GHOUL_TYPE, this.world);
+                NecroticGhoulEntity ghoulEntity = Main.NECROTIC_GHOUL_TYPE.create(this.world);
                 ghoulEntity.setPosition((this.posX + radius * Math.cos(angle)), this.posY, (this.posZ + radius * Math.sin(angle)));
                 this.world.addEntity(ghoulEntity);
                 angle += step;
@@ -154,8 +166,8 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
     }
 
     public boolean shouldSummonGhouls(LivingEntity entity) {
-        return (this.getGhoulSummoningState() == GhoulSummoningState.CAN_SUMMON)
-                && entity.world.getEntitiesWithinAABB(NecroticGhoulEntity.class, this.getBoundingBox().grow(160)).isEmpty();
+        return (this.getGhoulSummoningState() != GhoulSummoningState.COOLDOWN)
+                && entity.world.getEntitiesWithinAABB(NecroticGhoulEntity.class, this.getBoundingBox().grow(60)).isEmpty();
     }
 
     public GhoulSummoningState getGhoulSummoningState() {
