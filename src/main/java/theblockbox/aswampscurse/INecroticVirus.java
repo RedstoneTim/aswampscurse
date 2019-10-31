@@ -20,19 +20,15 @@ public interface INecroticVirus {
     public void setTimeInfected(long timeInfected);
 
     public default void infectIfPossible(Entity entity) {
-        System.out.println("infecting");
         if (!this.isInfected(entity.world)) {
             this.setTimeInfected(entity.world.getGameTime());
-            System.out.println("almost infecting");
             if (entity instanceof LivingEntity) {
                 ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.BLINDNESS, 30));
                 ((LivingEntity) entity).addPotionEffect(new EffectInstance(Effects.SLOWNESS, 65, 2));
-                System.out.println("successful");
                 if (entity instanceof PlayerEntity) {
                     ObfuscationReflectionHelper.setPrivateValue(PlayerEntity.class, (PlayerEntity) entity,
                             new ModifiedFoodStats(ObfuscationReflectionHelper.getPrivateValue(PlayerEntity.class, (PlayerEntity) entity, "field_71100_bB")),
                             "field_71100_bB");
-                    System.out.println("plusquam successful");
                 }
             }
         }
@@ -40,12 +36,11 @@ public interface INecroticVirus {
 
     public default boolean isInfected(World world) {
         long timeInfected = this.getTimeInfected();
-        System.out.println(timeInfected + " " + (world.getGameTime() - timeInfected));
-        return (timeInfected != 1) && ((world.getGameTime() - timeInfected) <= 19200);
+        return (timeInfected != 1L) && ((world.getGameTime() - timeInfected) <= 19200);
     }
 
     public static class NecroticVirus implements INecroticVirus {
-        private long timeInfected = -1;
+        private long timeInfected = -1L;
 
         @Override
         public long getTimeInfected() {
@@ -55,6 +50,8 @@ public interface INecroticVirus {
         @Override
         public void setTimeInfected(long timeInfected) {
             this.timeInfected = timeInfected;
+            if (timeInfected == 0)
+                this.timeInfected = -1L;
         }
     }
 

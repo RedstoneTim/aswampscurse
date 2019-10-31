@@ -84,7 +84,7 @@ public class Main {
     }
 
     public static void cureInfected(LivingEntity entity, INecroticVirus necroticVirus, boolean killEntity, boolean summonGhoul) {
-        if ((entity.world.getGameTime() - necroticVirus.getTimeInfected()) > 19200) {
+        if (necroticVirus.isInfected(entity.world) && (entity.world.getGameTime() - necroticVirus.getTimeInfected()) > 19200) {
             necroticVirus.setTimeInfected(-1L);
             NecroticGhoulEntity ghoul = Main.NECROTIC_GHOUL_TYPE.create(entity.world);
             ghoul.enablePersistence();
