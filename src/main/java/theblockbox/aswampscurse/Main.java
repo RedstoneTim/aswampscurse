@@ -3,7 +3,9 @@ package theblockbox.aswampscurse;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.*;
-import net.minecraft.entity.merchant.villager.VillagerEntity;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.merchant.villager.AbstractVillagerEntity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -27,9 +29,9 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.items.IItemHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import theblockbox.aswampscurse.entity.NecromanticWitchEntity;
@@ -38,6 +40,7 @@ import theblockbox.aswampscurse.entity.NecroticGhoulEntity;
 import theblockbox.aswampscurse.entity.NecroticGhoulRenderer;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 
 @Mod("aswampscurse")
 public class Main {
@@ -122,10 +125,21 @@ public class Main {
             event.getRegistry().registerAll(Main.ALGAE_EFFECT);
         }
 
+        @OnlyIn(Dist.CLIENT)
         @SubscribeEvent
-        public static void onCapabilityAttach(final AttachCapabilitiesEvent<Entity> event) {
+        public static void onModelRegister(final ModelRegistryEvent event) {
+            EntityRendererManager manager = Minecraft.getInstance().getRenderManager();
+            manager.register(NecromanticWitchEntity.class, new NecromanticWitchRenderer(manager));
+            manager.register(NecroticGhoulEntity.class, new NecroticGhoulRenderer(manager));
+        }
+    }
+
+    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class ForgeEvents {
+        @SubscribeEvent
+        public static void onAttachCapabilities(final AttachCapabilitiesEvent<Entity> event) {
             Entity entity = event.getObject();
-            if ((entity instanceof PlayerEntity) || (entity instanceof VillagerEntity)) {
+            if ((entity instanceof PlayerEntity) || (entity instanceof AbstractVillagerEntity)) {
                 event.addCapability(Main.NECROTIC_VIRUS, new NecroticVirusProvider());
             }
         }
@@ -160,8 +174,13 @@ public class Main {
                             // if infected, infect with 75% chance
                             hurtEntity.getCapability(Main.CAPABILITY_NECROTIC_VIRUS).ifPresent(virus -> virus.infectIfPossible(hurtEntity));
                         }
-                        if (hurtEntity instanceof PlayerEntity) {
+                        if ((hurtEntity instanceof PlayerEntity) || (hurtEntity instanceof AbstractVillagerEntity)) {
                             ((PlayerEntity) attackingEntity).getFoodStats().addStats(2, 1);
+                            if (hurtEntity instanceof AbstractVillagerEntity) {
+                                AbstractVillagerEntity villager = (AbstractVillagerEntity) hurtEntity;
+                                villager.goalSelector.addGoal(2, new MeleeAttackGoal(villager, 1.0D, false));
+                                villager.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(villager, AbstractVillagerEntity.class, false));
+                            }
                         }
                     }
                 });
@@ -170,14 +189,6 @@ public class Main {
                     && (hurtEntity.getCapability(Main.CAPABILITY_NECROTIC_VIRUS).filter(virus -> virus.isInfected(hurtEntity.world)).isPresent())) {
                 event.setCanceled(true);
             }
-        }
-
-        @OnlyIn(Dist.CLIENT)
-        @SubscribeEvent
-        public static void onModelRegister(final ModelRegistryEvent event) {
-            EntityRendererManager manager = Minecraft.getInstance().getRenderManager();
-            manager.register(NecromanticWitchEntity.class, new NecromanticWitchRenderer(manager));
-            manager.register(NecroticGhoulEntity.class, new NecroticGhoulRenderer(manager));
         }
     }
 }
