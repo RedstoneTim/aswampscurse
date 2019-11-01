@@ -1,12 +1,13 @@
 {
     "homepage": "https://minecraft.curseforge.com/projects/aswampscurse",
     "1.14.4": {
-        "1.0.0": "Added Necromantic Witch, Necrotic Ghouls and Necrotic Virus"
+        "1.0.0": "Added Necromantic Witch, Necrotic Ghouls and Necrotic Virus",
+		"1.0.2": "Fixed hunger issue"
     },
 
     "promos": {
-        "1.14.4-latest": "1.0.0",
-        "1.14.4-recommended": "1.0.0"
+        "1.14.4-latest": "1.0.2",
+        "1.14.4-recommended": "1.0.2"
     },
     "supportedmcversions":["1.14.4"]
 }

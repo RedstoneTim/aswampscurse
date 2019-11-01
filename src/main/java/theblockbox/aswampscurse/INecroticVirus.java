@@ -36,7 +36,7 @@ public interface INecroticVirus {
 
     public default boolean isInfected(World world) {
         long timeInfected = this.getTimeInfected();
-        return (timeInfected != 1L) && ((world.getGameTime() - timeInfected) <= 19200);
+        return (timeInfected != -1L) && ((world.getGameTime() - timeInfected) <= 19200);
     }
 
     public static class NecroticVirus implements INecroticVirus {
