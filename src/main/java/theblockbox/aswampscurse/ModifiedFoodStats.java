@@ -25,7 +25,7 @@ public class ModifiedFoodStats extends FoodStats {
     public void consume(Item item, ItemStack stack) {
         Food food = item.getFood();
         if ((food != null) && food.isMeat()) {
-            this.foodStats.consume(item,stack);
+            this.foodStats.consume(item, stack);
         }
     }
 

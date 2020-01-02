@@ -26,7 +26,6 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -70,7 +69,7 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
 
     public static boolean canSpawnHere(EntityType<? extends MonsterEntity> p_223325_0_, IWorld world, SpawnReason p_223325_2_, BlockPos pos, Random p_223325_4_) {
         Biome biome = world.getBiome(pos);
-        return (biome == Biomes.SWAMP || biome == Biomes.SWAMP_HILLS) && MonsterEntity.func_223325_c(p_223325_0_,world,p_223325_2_,pos, p_223325_4_);
+        return (biome == Biomes.SWAMP || biome == Biomes.SWAMP_HILLS) && MonsterEntity.func_223325_c(p_223325_0_, world, p_223325_2_, pos, p_223325_4_);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package theblockbox.aswampscurse;
 
-import net.minecraft.command.arguments.NBTCompoundTagArgument;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;

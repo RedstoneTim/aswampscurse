@@ -15,10 +15,13 @@ import net.minecraft.potion.*;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -41,6 +44,7 @@ import theblockbox.aswampscurse.entity.NecroticGhoulRenderer;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.jar.Manifest;
 
 @Mod("aswampscurse")
 public class Main {
@@ -113,6 +117,8 @@ public class Main {
         public static void onEntityRegistry(final RegistryEvent.Register<EntityType<?>> event) {
             event.getRegistry().registerAll(Main.NECROMANTIC_WITCH_TYPE, Main.NECROTIC_GHOUL_TYPE);
             EntitySpawnPlacementRegistry.register(Main.NECROMANTIC_WITCH_TYPE, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::func_223325_c);
+            BiomeDictionary.getBiomes(BiomeDictionary.Type.SWAMP).forEach(biome -> biome.getSpawns(Main.NECROMANTIC_WITCH_TYPE.getClassification())
+                    .add(new Biome.SpawnListEntry(Main.NECROMANTIC_WITCH_TYPE, 5, 1, 1)));
         }
 
         @SubscribeEvent
