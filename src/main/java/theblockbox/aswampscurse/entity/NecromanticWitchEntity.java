@@ -35,24 +35,7 @@ import theblockbox.aswampscurse.Main;
 import java.util.Random;
 
 public class NecromanticWitchEntity extends MonsterEntity implements IRangedAttackMob {
-    public static final IDataSerializer<Long> LONG_SERIALIZER = new IDataSerializer<Long>() {
-        public void write(PacketBuffer buf, Long value) {
-            buf.writeLong(value);
-        }
-
-        public Long read(PacketBuffer buf) {
-            return buf.readLong();
-        }
-
-        public Long copyValue(Long value) {
-            return value;
-        }
-    };
-    public static final DataParameter<Long> GHOUL_SUMMON = EntityDataManager.createKey(NecromanticWitchEntity.class, NecromanticWitchEntity.LONG_SERIALIZER);
-
-    static {
-        DataSerializers.registerSerializer(NecromanticWitchEntity.LONG_SERIALIZER);
-    }
+    public static final DataParameter<String> GHOUL_SUMMON_TIME = EntityDataManager.createKey(NecromanticWitchEntity.class, DataSerializers.STRING);
 
     public NecromanticWitchEntity(EntityType<NecromanticWitchEntity> type, World world) {
         super(type, world);
@@ -61,7 +44,7 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
             public void setLookPositionWithEntity(Entity entity, float p_75651_2_, float p_75651_3_) {
                 super.setLookPositionWithEntity(entity, p_75651_2_, p_75651_3_);
                 if ((entity instanceof LivingEntity) && (p_75651_2_ == p_75651_3_) && (p_75651_2_ == 30.0F) && (NecromanticWitchEntity.this.shouldSummonGhouls((LivingEntity) entity))) {
-                    NecromanticWitchEntity.this.dataManager.set(NecromanticWitchEntity.GHOUL_SUMMON, NecromanticWitchEntity.this.world.getGameTime());
+                    NecromanticWitchEntity.this.dataManager.set(NecromanticWitchEntity.GHOUL_SUMMON_TIME, String.valueOf(NecromanticWitchEntity.this.world.getGameTime()));
                 }
             }
         };
@@ -75,7 +58,7 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
     @Override
     protected void registerData() {
         super.registerData();
-        this.getDataManager().register(NecromanticWitchEntity.GHOUL_SUMMON, -1L);
+        this.getDataManager().register(NecromanticWitchEntity.GHOUL_SUMMON_TIME, String.valueOf(-1L));
     }
 
     @Override
@@ -110,7 +93,7 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
                 this.world.addEntity(ghoulEntity);
                 angle += step;
             }
-            this.dataManager.set(NecromanticWitchEntity.GHOUL_SUMMON, this.world.getGameTime());
+            this.dataManager.set(NecromanticWitchEntity.GHOUL_SUMMON_TIME, String.valueOf(this.world.getGameTime()));
         } else {
             // (try to) throw damage potion at attacker
             // https://youtu.be/pn4_vcSPZwg
@@ -170,7 +153,7 @@ public class NecromanticWitchEntity extends MonsterEntity implements IRangedAtta
     }
 
     public GhoulSummoningState getGhoulSummoningState() {
-        long ticks = this.getDataManager().get(NecromanticWitchEntity.GHOUL_SUMMON);
+        long ticks = Long.parseLong(this.getDataManager().get(NecromanticWitchEntity.GHOUL_SUMMON_TIME));
         if (ticks != -1L) {
             long time = this.world.getGameTime() - ticks;
             if (time < 4000L) {

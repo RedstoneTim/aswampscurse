@@ -3,12 +3,13 @@
     "1.14.4": {
         "1.0.0": "Added Necromantic Witch, Necrotic Ghouls and Necrotic Virus",
 		"1.0.2": "Fixed hunger issue",
-        "1.0.3": "Fixed Necromantic Witch not spawning naturally"
+        "1.0.3": "Fixed Necromantic Witch not spawning naturally",
+        "1.0.4": "Fixed issue with custom data serializer"
     },
 
     "promos": {
-        "1.14.4-latest": "1.0.3",
-        "1.14.4-recommended": "1.0.3"
+        "1.14.4-latest": "1.0.4",
+        "1.14.4-recommended": "1.0.4"
     },
     "supportedmcversions":["1.14.4"]
 }
